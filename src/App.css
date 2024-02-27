@@ -1,0 +1,21 @@
+body{
+  text-align: center;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  background-color: #75C7E2;
+}
+
+#form-container{
+  background-color: #C7E5EF;
+  width: 50%;
+  height: 40vh;
+  margin:auto;
+  border: 2px solid;
+  border-radius: 5%;
+}
+/* key frames are for custom animations*/
+
+
+.hide{
+  opacity :0;
+  transition: opacity 2s ease out;
+}
