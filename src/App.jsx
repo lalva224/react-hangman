@@ -17,18 +17,18 @@ function App() {
 
   
   //this will be passed to the puzzle component so it knows what to display.
-  const [unseen,setUnseen] = useState(new Set())
+  const [unseen,setUnseen] = useState([])
 
   //useState renders before useEffect, this means if i pass in letters in useState it will only render an empty array
 
   useEffect(()=>{
-    setUnseen(new Set(letters))
+    setUnseen(letters)
    
    //onMount letters is an empty array, need to change on Update
   },[letters])
   //if not in unseen but in seen then a message but be sent to user that letter has already been guessed!
   
-  const [seen,setSeen] = useState(new Set())
+  const [seen,setSeen] = useState([])
   //store user input
   const [formData, setformData] = useState('')
   //decrements if not in unseen or seen
@@ -43,19 +43,27 @@ function App() {
     /*if letter(formData) inside unseen then remove it from unseen and the puzzle component will react dynamically,
     Then, add to seen
     */
-   if(unseen.has(formData)){
+  
+   if(unseen.includes(formData)){
+    console.log(seen.join(''),letters.join(''))
      removeFromUnseen(formData)
-     setSeen((seen) =>new Set([...seen,formData]))
+     setSeen((seen) =>[...seen,formData])
      setAvailableGuesses(availableGuesses=> availableGuesses-1)
-     console.log(seen)
+     
    }
+
    //if not in unseen but in seen then an alert prompting re-try must be sent
-   else if(seen.has(formData)){
+   else if(seen.includes(formData)){
     console.log("You've already guessed this!")
     //transtion of our message
     triggerSeenTransiton()
     
    }
+   
+   else if(JSON.stringify(seen)===JSON.stringify(letters)){
+    alert("You've won!!")
+   }
+
    //not in seen, nor unseen, must decrement available gusses
    else{
     if(availableGuesses==0){
@@ -68,15 +76,20 @@ function App() {
   }
 
   const removeFromUnseen =(data) =>{
-    /*have to create a new set, convert to an array and filter.
-    Consideration: Using sets in react isnt worth it because every time a removal is done a new set is created. 
-    But i suppose a new array is created every time as well if i were to have done that
-    */
-   let new_set = new Set([...unseen].filter((letter)=>letter!=data))
-    setUnseen(new_set)
+  
+   let new_arr =unseen.filter((letter)=>letter!=data)
+    setUnseen(new_arr)
   }
   
   const triggerSeenTransiton = () =>{
+    setDisplaySeen(displaySeen=>!displaySeen)
+
+    setTimeout(()=>{
+      setDisplayWrong(displaySeen=>!displaySeen)
+    },2000)
+  }
+
+  const triggerWrongTransition = () =>{
     setDisplayWrong(displayWrong=>!displayWrong)
 
     setTimeout(()=>{
@@ -84,10 +97,7 @@ function App() {
     },2000)
   }
 
-  const triggerWrongTransition = () =>{
-
-  }
-
+  
   return (
     <>
       <header>
@@ -95,7 +105,7 @@ function App() {
       </header>
       
       <div id = 'puzzle-container'>
-        <Puzzle letters = {letters} unseen = {unseen}/>
+        <Puzzle letters = {letters} unseen_arr = {unseen}/>
       </div>
       <div id = "form-container">
         <form onSubmit={handleSubmit}>
@@ -105,11 +115,15 @@ function App() {
         </form>
 
         <p className={displaySeen? '' : 'hide'}>You've already clicked this!</p>
-        {/* <p className={displayWrong? '' : 'hide'}>Wrong!{availableGuesses} remaining</p> */}
+        
       </div>
     </>
     
   )
-}
+  }
+
+  
+
+  
 
 export default App
